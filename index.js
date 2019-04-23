@@ -1,6 +1,7 @@
 var Service, Characteristic;
 
-const Gpio = require('pigpio').Gpio;
+const wpi = require('node-wiring-pi');
+wpi.setup('wpi');
 
 module.exports = function(homebridge) {
   console.log("Homebridge API version:", homebridge.version);
@@ -38,8 +39,7 @@ function GPIOLightPlatform(log, config, api) {
 
   this.pin = config.pin || 1;
 
-  this.gpio = new Gpio(this.pin, { mode: Gpio.OUTPUT });
-  console.dir(this);
+  wpi.pinMode(this.pin, wpi.PWM_OUTPUT);
 }
 
 GPIOLightPlatform.identify = function(callback) {
@@ -50,11 +50,11 @@ GPIOLightPlatform.identify = function(callback) {
 var api = {
   getPowerState: function(callback) {
     try {
-      if (this.gpio.getPwmDutyCycle() > 0)
+      if (this.cache.brightness > 0)
         callback(null, true);
       else callback(null, false);
 
-      this.log('Power is currently %s', this.gpio.getPwmDutyCycle() > 0 ? 'ON' : 'OFF');
+      this.log('Power is currently %s', this.cache.brightness > 0 ? 'ON' : 'OFF');
     }
     catch(err) {
       this.log('getPowerState() failed: %s', err.message);
@@ -65,14 +65,8 @@ var api = {
       this.cache.state = state;
 
       try {
-        if (state) {
-          this.cache.brightness = 255;
-          this.gpio.pwmWrite(255);
-        }
-        else {
-          this.cache.brightness = 0;
-          this.gpio.pwmWrite(0);
-        }
+        if (state) wpi.pwmWrite(this.pin, this.cache.brightness = 255);
+        else wpi.pwmWrite(this.pin, this.cache.brightness = 0);
 
         callback(null, state);
       }
@@ -88,8 +82,8 @@ var api = {
           return;
       }
 
-      this.log('Brightness is currently at %s %', this.gpio.getPwmDutyCycle() || this.cache.brightness || 0);
-      callback(null, this.gpio.getPwmDutyCycle() || this.cache.brightness || 0);
+      this.log('Brightness is currently at %s %', this.cache.brightness || 0);
+      callback(null, this.cache.brightness || 0);
   },
   setBrightness: function(level, callback) {
       if (!this.brightness) {
@@ -99,7 +93,7 @@ var api = {
       }
 
       this.cache.brightness = level;
-      this.gpio.pwmWrite(level * 255 / 100);
+      this.gpio.pwmWrite(this.pin, level * 255 / 100);
 
       this.log('setBrightness() successfully set to %s %', level);
       callback();
