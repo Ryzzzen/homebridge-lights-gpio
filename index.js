@@ -1,4 +1,3 @@
-const request = require('request');
 var Service, Characteristic;
 
 const Gpio = require('pigpio').Gpio;
