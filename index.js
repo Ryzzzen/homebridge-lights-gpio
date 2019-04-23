@@ -36,7 +36,9 @@ function GPIOLightPlatform(log, config, api) {
   if (config.colors)
     this.colors = { hue: 0, saturation: 0 };
 
-  this.gpio = new Gpio(config.pin = this.pin, { mode: Gpio.OUTPUT });
+  this.pin = config.pin || 1;
+
+  this.gpio = new Gpio(this.pin, { mode: Gpio.OUTPUT });
   console.dir(this);
 }
 
