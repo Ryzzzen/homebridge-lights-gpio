@@ -1,0 +1,18 @@
+{
+  "name": "homebridge-lights-gpio",
+  "version": "0.0.1",
+  "description": "GPIO light plugin for homebridge: https://github.com/nfarina/homebridge",
+  "license": "ISC",
+  "keywords": [
+    "homebridge-plugin",
+    "homebridge-lights-gpio"
+  ],
+  "engines": {
+    "node": ">=0.12.0",
+    "homebridge": ">=0.2.0"
+  },
+  "dependencies": {
+    "pigpio": "^1.2.2"
+  },
+  "os" : ["linux"]
+}
